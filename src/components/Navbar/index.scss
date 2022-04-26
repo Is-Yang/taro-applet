@@ -1,0 +1,16 @@
+.page-navbar {
+  width: 100%;
+  height: 80rpx;
+  top: 0;
+  padding-bottom: 15rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+  font-size: 38rpx;
+
+  .left-full, .right-full {
+    padding: 0 25rpx;
+    font-size: 30rpx;
+  }
+}
