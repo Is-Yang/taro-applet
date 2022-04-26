@@ -11,10 +11,15 @@ type videoList = Array<{
   name: string;
 }>
 
-type beginTime = {
+type dateTime = {
   date: string;
   time: string;
 }
+
+type orgTree = Array<{
+  cameraId: string,
+  name: string
+}>
 
 const Page: FC = () => {
   const [ videoList ] = useState<videoList>([
@@ -61,17 +66,56 @@ const Page: FC = () => {
     }
   ])
 
-  const [ beginTime, setBeginTime ] = useState<beginTime>({
+  const [ beginTime, setBeginTime ] = useState<dateTime>({
     date: '',
     time: ''
   })
 
+  const [ endTime, setEndTime ] = useState<dateTime>({
+    date: '',
+    time: ''
+  })
+  const [ cameraOptions, setCameraOptions ] = useState<orgTree>([
+    {
+      cameraId: '6532',
+      name: '新意新石业2'
+    }, {
+      cameraId: '5679',
+      name: '金骏广场-塔吊2'
+    }
+  ])
+  const [ cameraIndex, setCameraIndex ] = useState<number>(0)
+
   const onBeginTime = e => {
-    console.log(e)
+    setBeginTime({
+      time: e.detail.value,
+      date: beginTime.date
+    })
   }
 
   const onBeginDate = e => {
+    setBeginTime({
+      time: beginTime.time,
+      date: e.detail.value
+    })
+  }
 
+  const onEndDate = e => {
+    setEndTime({
+      time: endTime.time,
+      date: e.detail.value
+    })
+  }
+
+  const onEndTime = e => {
+    setEndTime({
+      time: e.detail.value,
+      date: endTime.date
+    })
+  }
+
+  const onSelect = e => {
+    setCameraIndex(Number(e.detail.value))
   }
 
   useReachBottom(() => {
@@ -96,30 +140,36 @@ const Page: FC = () => {
               <Label className="label">开始时间：</Label>
               <View className="time-sty">
                 <Picker mode='date' onChange={onBeginDate}>
-                  <Input className='input-sty' type="text" value={beginTime.date} disabled></Input>
+                  <Input placeholder="请选择" className='input-sty' type="text" value={beginTime.date} disabled></Input>
                 </Picker>
                 <Picker mode='time' onChange={onBeginTime}>
-                  <Input className='input-sty' style={{ width: '150rpx', marginLeft: '10rpx' }}></Input>
+                  <Input placeholder="请选择" className='input-sty' value={beginTime.time}  style={{ width: '150rpx', marginLeft: '10rpx' }} disabled></Input>
                 </Picker>
               </View>
             </View>
             <View className='row'>
               <Label className="label">结束时间：</Label>
               <View className="time-sty">
-                <Picker mode='date' onChange={onBeginDate}>
-                  <Input className='input-sty' type="text" value={beginTime.date} disabled></Input>
+                <Picker mode='date' onChange={onEndDate}>
+                  <Input placeholder="请选择" className='input-sty' type="text" value={endTime.date} disabled></Input>
                 </Picker>
-                <Picker mode='time' onChange={onBeginTime}>
-                  <Input className='input-sty' style={{ width: '150rpx', marginLeft: '10rpx' }}></Input>
+                <Picker mode='time' onChange={onEndTime}>
+                  <Input placeholder="请选择" className='input-sty' type="text" value={endTime.time} style={{ width: '150rpx', marginLeft: '10rpx' }} disabled></Input>
                 </Picker>
               </View>
             </View>
             <View className='row'>
-            <Label className="label">通道：</Label>
-            <Picker mode='date' onChange={onBeginDate} style={{ flex: 1}}>
-              <Input className='input-sty' type="text" value={beginTime.date} disabled></Input>
-            </Picker>
-          </View>
+              <Label className="label">通道：</Label>
+              <Picker mode='selector' 
+                range={cameraOptions} 
+                range-key="name"
+                value={cameraOptions[cameraIndex].cameraId}
+                onChange={onSelect} 
+                style={{ flex: 1}}
+              >
+                <Input placeholder="请选择" className='input-sty' type="text" value={cameraOptions[cameraIndex].name} disabled></Input>
+              </Picker>
+            </View>
           </View>
           <Button className="btn-search">查询</Button>
         </View>

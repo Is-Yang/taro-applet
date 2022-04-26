@@ -22,20 +22,23 @@ page {
   .screen-box {
     display: flex;
     align-items: center;
-    margin: 20rpx;
+    margin: 10rpx 20rpx 20rpx;
     padding: 15rpx;
     background-color: #fff;
     border-radius: 20rpx;
-    font-size: 24rpx;
+    font-size: 25rpx;
+    box-shadow: 0 5rpx 15rpx #aaa;
 
     .row {
       display: flex;
+      align-items: center;
       margin: 10rpx 0;
       .label {
         width: 130rpx;
         text-align: right;
       }
       .input-sty {
+        padding: 6rpx 12rpx;
         border: 1px solid #ddd;
         border-radius: 4rpx;
       }
@@ -49,8 +52,8 @@ page {
     .btn-search {
       margin-left: 20rpx;
       width: 140rpx;
-      height: 80rpx;
-      line-height: 80rpx;
+      height: 65rpx;
+      line-height: 65rpx;
       background-image: linear-gradient(90deg, #5869ff 0%, #6392ff 100%);
       color: #fff;
       border: none;
@@ -66,7 +69,7 @@ page {
 }
 
 .video-wrapper {
-  margin-top: 450rpx;
+  margin-top: 620rpx;
   
   .video-list {
     display: grid;
@@ -74,10 +77,11 @@ page {
     grid-template-rows: 1fr 1fr 1fr;
     grid-gap: 20rpx;
     padding: 10rpx 25rpx 20rpx;
-  
+
     .video-item {
       background-color: #fff;
       border-radius: 24rpx;
+      box-shadow: 0 5rpx 15rpx #ddd;
       overflow: hidden;
       .video-img {
         display: block;
@@ -87,7 +91,7 @@ page {
   
       .video-title {
         margin: 15rpx 10rpx;
-        font-size: 24rpx;
+        font-size: 26rpx;
         display: -webkit-box;
         overflow: hidden;
         text-overflow: ellipsis;

@@ -11,6 +11,11 @@ type videoList = Array<{
   name: string;
 }>
 
+type orgTree = Array<{
+  cameraId: string,
+  name: string
+}>
+
 const Page: FC = () => {
   const [ videoList ] = useState<videoList>([
     {
@@ -56,6 +61,20 @@ const Page: FC = () => {
     }
   ])
 
+  const [ cameraOptions, setCameraOptions ] = useState<orgTree>([
+    {
+      cameraId: '6532',
+      name: '新意新石业2'
+    }, {
+      cameraId: '5679',
+      name: '金骏广场-塔吊2'
+    }
+  ])
+  const [ cameraIndex, setCameraIndex ] = useState<number>(0)
+  const onSelect = e => {
+    setCameraIndex(Number(e.detail.value))
+  }
+
   // function toDetail(id) {
   //   console.log(id)
   //   Taro.navigateTo({
@@ -83,9 +102,15 @@ const Page: FC = () => {
           <View style={{ flex: 1 }}>
             <View className='row'>
               <Label className="label">通道：</Label>
-              {/* <Picker mode='date' onChange={onBeginDate} style={{ flex: 1}}>
-                <Input className='input-sty' type="text" value={beginTime.date} disabled></Input>
-              </Picker> */}
+              <Picker mode='selector' 
+                range={cameraOptions} 
+                range-key="name"
+                value={cameraOptions[cameraIndex].cameraId}
+                onChange={onSelect} 
+                style={{ flex: 1}}
+              >
+                <Input placeholder="请选择" className='input-sty' type="text" value={cameraOptions[cameraIndex].name} disabled></Input>
+              </Picker>
             </View>
           </View>
           <Button className="btn-search">查询</Button>
