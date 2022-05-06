@@ -1,15 +1,14 @@
 export default defineAppConfig({
   pages: [
-    'pages/playback/index',
     'pages/home/index',
+    'pages/playback/index',
     'pages/livePlay/index',
-    'pages/login/index'
   ],
   subPackages: [
     {
       root: 'pages/package/',
       pages: [
-        'detail/index'
+        'login/index'
       ]
     }
   ],

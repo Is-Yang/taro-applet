@@ -2,7 +2,7 @@ import Taro from '@tarojs/taro'
 import { FC } from 'react'
 import { useDispatch } from 'react-redux'
 import { View, Button, Image } from '@tarojs/components'
-import Navbar from '../../components/Navbar'
+import Navbar from '../../../components/Navbar'
 import './index.scss'
 
 const Page: FC = () => {
@@ -42,7 +42,7 @@ const Page: FC = () => {
     })
   }
 
-  const bg = require('../../assets/images/bg02.png');
+  const bg = require('../../../assets/images/bg02.png');
 
   return (
     <View className='login-page'>

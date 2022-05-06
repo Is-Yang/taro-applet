@@ -10,25 +10,32 @@ import './index.scss'
 type bannerList = Array<{
   pic: string;
   id: number;
+  title: string,
+  content: string
 }>
 
 const Page: FC = () => {
   const [ bannerList ] = useState<bannerList>([
     {
       pic: require('../../assets/images/banner01.jpg'),
-      id: 1
+      id: 1,
+      title: '海珠广场',
+      content: `海珠广场位于广州市老城区中心轴线与滨江景观带的交点，是广州唯一的滨江广场。
+      它曾充当海珠桥被炸与重修、解放军进城等重大历史事件的见证人角色，
+      海珠广场和广州解放纪念像以“珠海丹心”入选羊城新八景。
+      俯瞰海珠广场、海珠桥、珠江在侨光路8号华夏酒店9楼顶设置安装一台8K超高清视频摄像机捕捉海珠广场公园、海珠桥、珠江两岸景观直播。`
     }, {
       pic: require('../../assets/images/banner02.jpg'),
-      id: 2
-    }, {
-      pic: require('../../assets/images/banner03.jpg'),
-      id: 3
-    }, {
-      pic: require('../../assets/images/banner04.jpg'),
-      id: 4
+      id: 2,
+      title: '珠江新城',
+      content: `珠江新城位于广州天河区，是广州唯一的滨江广场。
+      它曾充当海珠桥被炸与重修、解放军进城等重大历史事件的见证人角色，
+      海珠广场和广州解放纪念像以“珠海丹心”入选羊城新八景。
+      俯瞰海珠广场、海珠桥、珠江在侨光路8号华夏酒店9楼顶设置安装一台8K超高清视频摄像机捕捉海珠广场公园、海珠桥、珠江两岸景观直播。`
     }
   ])
   const [ isLogin ] = useState<Boolean>(Taro.getStorageSync('userInfo') ? true : false)
+  const [ currentIndex, setCurrentIndex] = useState<number>(0);
 
   useDidShow(() => {
     // 未登录
@@ -40,7 +47,11 @@ const Page: FC = () => {
   })
 
   const handleLeft = () => {
-    Taro.redirectTo({ url: '/pages/login/index' })
+    Taro.redirectTo({ url: '/pages/package/login/index' })
+  }
+
+  const changeSwiper = (e) => {
+    setCurrentIndex(e.detail.current);
   }
 
   return (
@@ -58,7 +69,7 @@ const Page: FC = () => {
           indicatorActiveColor='#043af0'
           circular
           indicatorDots
-          autoplay
+          onChange={changeSwiper}
           style={{ height: '400rpx' }}>
           {
             bannerList.map(item => (
@@ -71,14 +82,13 @@ const Page: FC = () => {
       </View>
       
       <View className='content-wrapper'>
-        <Text className='tag'>海珠广场</Text>
+        <Text className='tag'>
+          { bannerList[currentIndex].title }
+        </Text>
         <View className="introduce-box">
           <Text className='title'>项目介绍</Text>
           <View className="info">
-            海珠广场位于广州市老城区中心轴线与滨江景观带的交点，是广州唯一的滨江广场。
-            它曾充当海珠桥被炸与重修、解放军进城等重大历史事件的见证人角色，
-            海珠广场和广州解放纪念像以“珠海丹心”入选羊城新八景。
-            俯瞰海珠广场、海珠桥、珠江在侨光路8号华夏酒店9楼顶设置安装一台8K超高清视频摄像机捕捉海珠广场公园、海珠桥、珠江两岸景观直播。
+          { bannerList[currentIndex].content }
           </View>
         </View>
       </View>

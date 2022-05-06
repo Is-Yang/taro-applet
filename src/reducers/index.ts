@@ -14,7 +14,7 @@ function user(state = USER_STATE, action) {
   switch (action.type) {
     case 'SET_USER':
       const { phone } = action.data
-      return { ... state, phone: phone }
+      return { ...state, phone: phone }
     default:
       return state
   }
