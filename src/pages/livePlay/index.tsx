@@ -1,6 +1,6 @@
 import Taro, { usePullDownRefresh, useDidHide, useDidShow } from '@tarojs/taro'
 import { FC, useState } from 'react'
-import { View, Text, Image, Video } from '@tarojs/components'
+import { View, Text, Image, Video, LivePlayer } from '@tarojs/components'
 import Navbar from '../../components/Navbar'
 import { bg1, statusBarHeight, host } from '../../utils/common'
 import { btoa } from '../../utils/base64.js'
@@ -25,6 +25,7 @@ const Page: FC = () => {
 
   const onSelect = e => {
     queryData(e.id)
+    // queryData(57439)
   }
 
   function getCamera() {
@@ -142,6 +143,7 @@ const Page: FC = () => {
         let eSuccess = xmlDoc.getElementsByTagName('ErrorCode')
         if (eSuccess.length > 0) {
           let success = eSuccess[0].childNodes[0].textContent
+          console.log(success)
           if (parseInt(success) == 0) {
             let eURL = xmlDoc.getElementsByTagName('URL')
             let url = eURL[0].childNodes[0].textContent
@@ -149,6 +151,13 @@ const Page: FC = () => {
             // let token = eToken[0].childNodes[0].textContent
             // if (token == null || token == 'null') token = ''
             doWsVideo(url);
+          } else {
+            let eErrorMsg = xmlDoc.getElementsByTagName('ErrorMessage');
+            let errorMsg = eErrorMsg[0].childNodes.length > 0 ? eErrorMsg[0].childNodes[0].textContent : '视频请求失败';
+            Taro.showToast({
+              title: errorMsg,
+              icon: 'error'
+            });
           }
         } else {
           Taro.showToast({
@@ -167,7 +176,7 @@ const Page: FC = () => {
 
   function doWsVideo(url) {
     console.log(url);
-    wx.connectSocket({
+    Taro.connectSocket({
       url: url,
       success() {
         console.log('连接成功');
@@ -175,27 +184,59 @@ const Page: FC = () => {
     })
 
     // 接收消息
-    wx.onSocketMessage((res) => {
-      const base64 = `data:image/png;base64,${wx.arrayBufferToBase64(res.data)}`;
-      setVideoUrl(base64);
+    const fs = Taro.getFileSystemManager();
+    const target =`${Taro.env.USER_DATA_PATH}/${new Date().valueOf()}.mp4`;
+    Taro.onSocketMessage((res) => {
+      fs.access({
+        path: target,
+        success() {
+          // 文件存在
+          fs.appendFile({
+            filePath: target,
+            data: res.data,
+            encoding: 'binary',
+            success() {
+              console.log(target)
+              setVideoUrl(target);
+            },
+            fail() {
+              console.error('失败')
+            }
+          })
+        },
+        fail() {
+          // 文件不存在或其他错误
+          fs.writeFile({
+            filePath: target,
+            data: res.data,
+            encoding: 'binary',
+            success: (res) => {
+              console.log(res)
+              console.log(target)
+              setVideoUrl(target);
+            }
+          })
+        }
+      })
     })
 
-    wx.onSocketError((res) => {
+    Taro.onSocketError((res) => {
       console.log('websocket 连接打开失败，请检查！');
     })
 
-    wx.onSocketClose((res) => {
+    Taro.onSocketClose((res) => {
       console.log(res);
       console.log('websocket 关闭');
     })
   }
+
 
   useDidShow(() => {
     getCamera()
   })
 
   useDidHide(() => {
-    wx.closeSocket();
+    Taro.closeSocket();
   })
 
   return (
@@ -208,15 +249,15 @@ const Page: FC = () => {
 
       <View className="fixed-wrapper" style={{ marginTop: statusBarHeight + 'px' }}>
         <View className='video-play'>
-          <Image src={videoUrl} style="width: 100%; height: 100%;"></Image>
-          {/* <Video id='video'
+          {/* <Image src={videoUrl} style="width: 100%; height: 100%;"></Image> */}
+          <LivePlayer id='video'
             src={videoUrl}
-            initialTime={0}
-            controls={true}
-            autoplay={false}
-            loop={false}
+            // initialTime={0}
+            autoplay={true}
+            mode="live"
             muted={false}
-            style="width: 100%; height: 100%;"></Video> */}
+            show-progress={false}
+            style="width: 100%; height: 100%;"></LivePlayer>
         </View>
       </View>
 

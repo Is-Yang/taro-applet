@@ -1,6 +1,6 @@
 import Taro, { usePullDownRefresh, useReachBottom, useReady } from '@tarojs/taro'
 import { FC, useState } from 'react'
-import { View, Text, Image, Picker, Input, Label, Button } from '@tarojs/components'
+import { View, Text, Image, Picker, Input, Label, Button, Video } from '@tarojs/components'
 import Navbar from '../../components/Navbar'
 import { bg1, statusBarHeight, host } from '../../utils/common'
 import './index.scss'
@@ -26,7 +26,7 @@ type orgTree = Array<{
 
 const Page: FC = () => {
   const [ videoList, setVideoList ] = useState<videoList>([])
-
+  const [ videoUrl, setVideoUrl ] = useState<string>('');
   const [ beginTime, setBeginTime ] = useState<dateTime>({
     date: '',
     time: ''
@@ -230,6 +230,78 @@ const Page: FC = () => {
     });
   }
 
+  function doPlay(data) {
+    console.log(data)
+    const { CameraID, FileName, FileSize, StartCluster, DriverNo } = data;
+
+    Taro.showLoading({ title: '加载中' });
+    let params =
+      "<soapenv:Envelope xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' xmlns:web='http://webservices.video.tisson.com'>" +
+      '<soapenv:Header/>' +
+      '<soapenv:Body>' +
+      '<web:getRecordVideo>' +
+      '<web:cameraID>' +
+      CameraID +
+      '</web:cameraID>' +
+      '<web:fileName>' +
+      FileName +
+      '</web:fileName>' +
+      '<web:fileSize>' +
+      FileSize +
+      '</web:fileSize>' +
+      '<web:startCluster>' +
+      (StartCluster == '' ? 'null' : StartCluster) +
+      '</web:startCluster>' +
+      '<web:driverNo>' +
+      (DriverNo == '' ? 'null' : DriverNo) +
+      '</web:driverNo>' +
+      '</web:getRecordVideo>' +
+      '</soapenv:Body>' +
+      '</soapenv:Envelope>';
+
+    Taro.request({
+      url: host,
+      method: 'POST',
+      data: params,
+      header: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    }).then(res => {
+      if (res.statusCode == 200) {
+        Taro.hideLoading();
+
+        let dom = new DOMParser().parseFromString(res.data);
+        let xmlResponse = dom.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+        let xmlDoc = new DOMParser().parseFromString(xmlResponse.data, 'text/xml')
+        let eSuccess = xmlDoc.getElementsByTagName('ErrorCode')
+        if (eSuccess.length > 0) {
+          let success = eSuccess[0].childNodes[0].textContent
+          console.log(success)
+          if (parseInt(success) == 0) {
+            let eURL = xmlDoc.getElementsByTagName('URL')
+            let url = eURL[0].childNodes[0].textContent
+            // let eToken = xmlDoc.getElementsByTagName('Token')
+            // let token = eToken[0].childNodes[0].textContent
+            // if (token == null || token == 'null') token = ''
+            console.log(url)
+          } else {
+            let eErrorMsg = xmlDoc.getElementsByTagName('ErrorMessage');
+            let errorMsg = eErrorMsg[0].childNodes.length > 0 ? eErrorMsg[0].childNodes[0].textContent : '视频请求失败';
+            Taro.showToast({
+              title: errorMsg,
+              icon: 'error'
+            });
+          }
+        } else {
+          Taro.showToast({
+            title: '解析xml遇到未知的数据格式！',
+            icon: 'error'
+          });
+        }
+      }
+    });
+  }
+
   useReady(() => {
     getCamera()
   })
@@ -244,7 +316,9 @@ const Page: FC = () => {
       <Navbar title="回放" isFixed />
 
       <View className="fixed-wrapper" style={{ marginTop: statusBarHeight + 'px'}}>
-        <View className='video-play'></View>
+        <View className='video-play'>
+          <Video src={videoUrl} style="width: 100%; height: 100%;"></Video>
+        </View>
 
         <View className='screen-box'>
           <View style={{ flex: 1 }}>
@@ -293,7 +367,7 @@ const Page: FC = () => {
         <View className='video-list'>
           {
             videoList.map(item => (
-              <View className='video-item'>
+              <View className='video-item' onClick={ () => doPlay(item) }>
                 <Image src="https://res.wx.qq.com/wxdoc/dist/assets/img/0.4cb08bb4.jpg" className="video-img" mode="aspectFill" />
                 <Text className='video-title'>{item.FileName}</Text>
               </View>
